@@ -44,6 +44,12 @@ def split_dataset(df, dependent_column, test_set_size_percent=0.20):
     return split_data
 
 
+def upsample(X_df, y_df):
+    sm = SMOTE()
+    X_df_oversampled, y_df_oversampled = sm.fit_resample(X_df, y_df.ravel())
+    return X_df_oversampled, y_df_oversampled
+
+
 convert_to_dummy = ["Month", "VisitorType"]
 online_shoppers = generate_dummy_columns(online_shoppers, convert_to_dummy, False)
 
@@ -57,10 +63,7 @@ X_test = split_sets["X_test_set"]
 y_train = split_sets["y_train_set"]
 y_test = split_sets["y_test_set"]
 
-
-sm = SMOTE()
-X_train_oversampled, y_train_oversampled = sm.fit_resample(X_train, y_train.ravel())
-
+X_train_oversampled, y_train_oversampled = upsample(X_train, y_train)
 
 min_data_points_per_leaf = int(round(len(X_train_oversampled) * 0.05, 0))
 clf = RandomForestClassifier(
